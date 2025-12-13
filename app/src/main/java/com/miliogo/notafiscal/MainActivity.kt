@@ -45,18 +45,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class Destination(
-    val route: String,
-    val label: String,
-    val icon: ImageVector,
-    val contentDescription: String
-) {
-    HOME("home", "Home", Icons.Default.Home, "Home"),
-    LOOKUP("lookup", "Consulta", Icons.Default.Search, "Lookup"),
-    ADD("add", "Adicionar", Icons.Default.Add, "Add"),
-    ACCOUNT("account", "Conta", Icons.Default.AccountCircle, "Account")
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App()
@@ -105,60 +93,5 @@ fun App()
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         )
-    }
-}
-
-
-@Composable
-fun HomeScreen(modifier: Modifier = Modifier)
-{
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text("Bem vindo!")
-    }
-}
-
-@Composable
-fun LookupScreen(modifier: Modifier = Modifier)
-{
-
-}
-
-@Composable
-fun AddScreen(modifier: Modifier = Modifier)
-{
-    
-}
-
-@Composable
-fun AccountScreen(modifier: Modifier = Modifier)
-{
-
-}
-
-@Composable
-fun AppNavHost(
-    navController: NavHostController,
-    startDestination: Destination,
-    modifier: Modifier = Modifier
-) {
-    NavHost(
-        navController,
-        startDestination = startDestination.route
-    ) {
-        Destination.entries.forEach { destination ->
-            composable(destination.route) {
-                when (destination)
-                {
-                    Destination.HOME    -> HomeScreen(modifier)
-                    Destination.LOOKUP  -> LookupScreen(modifier)
-                    Destination.ADD     -> AddScreen(modifier)
-                    Destination.ACCOUNT -> AccountScreen(modifier)
-                }
-            }
-        }
     }
 }
