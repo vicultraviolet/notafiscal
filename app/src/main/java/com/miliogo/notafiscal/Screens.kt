@@ -23,6 +23,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.time.Duration.Companion.seconds
 
 enum class Destination(
     val route: String,
@@ -61,7 +66,7 @@ fun AddScreen(
 )
 {
     var shouldScan by remember { mutableStateOf(true) }
-    var result by remember { mutableStateOf("") }
+    var waitText by remember { mutableStateOf("Processando...") }
 
     if (shouldScan)
     {
@@ -71,8 +76,16 @@ fun AddScreen(
 
             shouldScan = false
             viewModel.processNFCe(it) { miliogoResponse ->
+                val json = Json.parseToJsonElement(miliogoResponse)
+
+                val msg = json.jsonObject["mensagem"]?.jsonPrimitive?.content
+                if (msg != null)
+                    waitText = msg
+
+                delay(2.seconds)
+
                 shouldScan = true
-                result = miliogoResponse
+                waitText = "Processando..."
             }
         }
     } else
@@ -82,16 +95,8 @@ fun AddScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text("Processando...")
+            Text(waitText)
         }
-    }
-
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(result)
     }
 }
 

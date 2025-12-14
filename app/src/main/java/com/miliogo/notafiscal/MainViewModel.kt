@@ -2,6 +2,7 @@ package com.miliogo.notafiscal
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
 
     fun processNFCe(
         urlString: String,
-        onResult: (miliogoResponse: String) -> Unit
+        onResult: suspend CoroutineScope.(miliogoResponse: String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val html = downloadNFCe(urlString)
