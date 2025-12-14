@@ -3,8 +3,23 @@ package com.miliogo.notafiscal
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.put
 import org.jsoup.Jsoup
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 const val GET_EAN_CODE = true
+
+fun changeDateFormat(
+    inputDateString: String,
+    inputPattern: String,
+    outputPattern: String
+): String {
+    val parser = SimpleDateFormat(inputPattern, Locale.ENGLISH)
+    val formatter = SimpleDateFormat(outputPattern, Locale.ENGLISH)
+
+    val date = parser.parse(inputDateString) ?: return ""
+
+    return formatter.format(date)
+}
 
 fun parseNFCeHtml(html: String, url: String = ""): JsonObject
 {
@@ -35,12 +50,20 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                 {
                     put("numero_cfe",        spans[2].text())
                     put("numero_serie_sat",  spans[1].text())
-                    put("valor_total",       spans[5].text())
+                    put("valor_total",       spans[5].text()
+                        .replace(',', '.'))
 
-                    put("data_hora_emissao", spans[3]
+                    val dateTime = spans[3]
                         .text()
-                        .replace(" ", " - ")
-                        .dropLast(6))
+                        .dropLast(6)
+
+                    val correctDateTime = changeDateFormat(
+                        dateTime,
+                        "dd/MM/yyyy HH:mm:ss",
+                        "yyyyMMddHHmmss"
+                    )
+
+                    put("data_hora_emissao", correctDateTime)
                 }
                 "Dados do Emitente" ->
                 {
@@ -76,7 +99,8 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                 }
                 "Totais" ->
                 {
-                    put("total_tributos", spans[spans.size-1].text())
+                    put("total_tributos", spans[spans.size-1].text()
+                        .replace(',', '.'))
                 }
                 else -> {}
             }
@@ -95,9 +119,11 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                 addJsonObject {
                     put("seq",         spans[0].text())
                     put("descricao",   spans[1].text())
-                    put("qtde",        spans[2].text())
+                    put("qtde",        spans[2].text()
+                        .replace(',', '.'))
                     put("un",          spans[3].text())
-                    put("valor_total", spans[4].text())
+                    put("valor_total", spans[4].text()
+                        .replace(',', '.'))
 
                     if (GET_EAN_CODE)
                     {
@@ -110,19 +136,22 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                     } else
                         put("codigo", spans2[0].text())
 
-                    put("valor_unit", spans2[19].text())
+                    put("valor_unit", spans2[19].text()
+                        .replace(',', '.'))
 
                     val desconto = spans2[9].text()
                     if (desconto.isEmpty())
-                        put("desconto", "00,00")
+                        put("desconto", "00.00")
                     else
-                        put("desconto", desconto)
+                        put("desconto", desconto
+                            .replace(',', '.'))
 
                     val tributos = spans2[23].text()
                     if (tributos == "\n")
-                        put("tributos", "00,00")
+                        put("tributos", "00.00")
                     else
-                        put("tributos", tributos)
+                        put("tributos", tributos
+                            .replace(',', '.'))
                 }
             }
         }
