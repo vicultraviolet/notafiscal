@@ -106,7 +106,7 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
             }
         }
 
-        putJsonArray("items")
+        putJsonArray("itens")
         {
             for (i in 0..<toggleBoxes.size)
             {
