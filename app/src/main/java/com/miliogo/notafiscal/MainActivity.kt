@@ -38,16 +38,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
 class MainActivity : ComponentActivity() {
+    var dataStoreManager: DataStoreManager? = null
+    var mainViewModel: MainViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        dataStoreManager = DataStoreManager(this)
+        dataStoreManager?.let { mainViewModel = MainViewModel(it) }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { NotaFiscalTheme { App() } }
+        setContent { NotaFiscalTheme { mainViewModel?.let { App(it) } } }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App()
+fun App(mainViewModel: MainViewModel)
 {
     val navController = rememberNavController()
     val startDestination = Destination.HOME
@@ -87,8 +93,8 @@ fun App()
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-
         AppNavHost(
+            mainViewModel,
             navController = navController,
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)

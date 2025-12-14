@@ -13,6 +13,7 @@ material3 = "1.4.0"
 cameraView = "1.5.2"
 barcodeScanningCommon = "17.0.0"
 cameraMlkitVision = "1.5.2"
+lifecycleViewmodelKtx = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +35,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
 barcode-scanning-common = { group = "com.google.mlkit", name = "barcode-scanning-common", version.ref = "barcodeScanningCommon" }
 androidx-camera-mlkit-vision = { group = "androidx.camera", name = "camera-mlkit-vision", version.ref = "cameraMlkitVision" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

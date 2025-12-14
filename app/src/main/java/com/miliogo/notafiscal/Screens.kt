@@ -3,13 +3,16 @@ package com.miliogo.notafiscal
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,36 +54,63 @@ fun LookupScreen(modifier: Modifier = Modifier)
 
 }
 
-var shouldScan = true
-
 @Composable
-fun AddScreen(modifier: Modifier = Modifier)
+fun AddScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+)
 {
-    val result = remember { mutableStateOf("") }
+    var shouldScan by remember { mutableStateOf(true) }
+    var result by remember { mutableStateOf("") }
 
     if (shouldScan)
+    {
         ScanWithPermission(modifier) {
-            result.value = it
             shouldScan = false
+            viewModel.processNFCe(it) { miliogoResponse ->
+                shouldScan = true
+                result = miliogoResponse
+            }
         }
+    } else
+    {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text("Processando...")
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(result.value)
+        Text(result)
     }
 }
 
 @Composable
-fun AccountScreen(modifier: Modifier = Modifier)
+fun AccountScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+)
 {
+    val secretKey by viewModel.secretKey.collectAsState()
 
+    OutlinedTextField(
+        value = secretKey,
+        onValueChange = { viewModel.updateSecretKey(it) },
+        label = { Text("Secret Key") },
+        modifier = modifier.fillMaxWidth()
+    )
 }
 
 @Composable
 fun AppNavHost(
+    viewModel: MainViewModel,
     navController: NavHostController,
     startDestination: Destination,
     modifier: Modifier = Modifier
@@ -95,11 +125,8 @@ fun AppNavHost(
                 {
                     Destination.HOME    -> HomeScreen(modifier)
                     Destination.LOOKUP  -> LookupScreen(modifier)
-                    Destination.ADD     -> {
-                        shouldScan = true
-                        AddScreen(modifier)
-                    }
-                    Destination.ACCOUNT -> AccountScreen(modifier)
+                    Destination.ADD     -> AddScreen(viewModel, modifier)
+                    Destination.ACCOUNT -> AccountScreen(viewModel, modifier)
                 }
             }
         }
