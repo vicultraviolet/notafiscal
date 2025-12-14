@@ -66,6 +66,9 @@ fun AddScreen(
     if (shouldScan)
     {
         ScanWithPermission(modifier) {
+            if (!shouldScan)
+                return@ScanWithPermission
+
             shouldScan = false
             viewModel.processNFCe(it) { miliogoResponse ->
                 shouldScan = true
