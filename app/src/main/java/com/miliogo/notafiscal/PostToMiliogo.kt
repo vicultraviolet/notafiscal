@@ -12,21 +12,26 @@ import java.nio.charset.StandardCharsets
 import kotlin.time.Duration.Companion.seconds
 
 
-suspend fun postToMiliogo(json: JsonObject, secretKey: String): String
+suspend fun postToMiliogo(
+    phpScript: String,
+    json: JsonObject,
+    secretKey: String? = null
+): String
 {
     var connection: HttpURLConnection? = null
     var response = ""
 
     try
     {
-        val url = URL("https://miliogo.com/cupom/import_json.php")
+        val url = URL("https://miliogo.com/$phpScript")
         connection = url.openConnection() as HttpURLConnection
 
         connection.doOutput = true
 
         connection.setRequestProperty("Content-Type", "application/json")
         connection.setRequestProperty("User-Agent", "miliogo-cupom-android-client/1.0")
-        connection.setRequestProperty("secret-key", secretKey)
+        if (secretKey != null)
+            connection.setRequestProperty("secret-key", secretKey)
 
         connection.requestMethod = "POST"
         connection.connectTimeout = 10000

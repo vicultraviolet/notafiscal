@@ -39,7 +39,11 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val html = downloadNFCe(urlString)
             val json = parseNFCeHtml(html, urlString)
-            val response = postToMiliogo(json, secretKey.value)
+            val response = postToMiliogo(
+                "cupom/import_json.php",
+                json,
+                secretKey.value
+            )
 
             onResult(response)
         }
