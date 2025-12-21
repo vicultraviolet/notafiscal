@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel() {
     private val _secretKey = MutableStateFlow("")
@@ -46,6 +43,17 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
             )
 
             onResult(response)
+        }
+    }
+
+    fun lookupMiliogoProducts(
+        info: JsonObject,
+        onResult: suspend CoroutineScope.(products: List<Product>) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val products = lookupMiliogoProducts(info)
+
+            onResult(products)
         }
     }
 }

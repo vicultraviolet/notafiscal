@@ -53,11 +53,7 @@ fun HomeScreen(modifier: Modifier = Modifier)
     }
 }
 
-@Composable
-fun LookupScreen(modifier: Modifier = Modifier)
-{
 
-}
 
 @Composable
 fun AddScreen(
@@ -132,7 +128,7 @@ fun AppNavHost(
                 when (destination)
                 {
                     Destination.HOME    -> HomeScreen(modifier)
-                    Destination.LOOKUP  -> LookupScreen(modifier)
+                    Destination.LOOKUP  -> LookupScreen(viewModel, modifier)
                     Destination.ADD     -> AddScreen(viewModel, modifier)
                     Destination.ACCOUNT -> AccountScreen(viewModel, modifier)
                 }
