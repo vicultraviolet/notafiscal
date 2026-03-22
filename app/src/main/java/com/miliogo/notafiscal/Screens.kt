@@ -1,16 +1,25 @@
 package com.miliogo.notafiscal
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +31,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -38,12 +51,11 @@ enum class Destination(
     HOME("home", "Home", Icons.Default.Home, "Home"),
     LOOKUP("lookup", "Consulta", Icons.Default.Search, "Lookup"),
     ADD("add", "Adicionar", Icons.Default.Add, "Add"),
-    ACCOUNT("account", "Conta", Icons.Default.AccountCircle, "Account")
+    SETTINGS("settings", "Configurações", Icons.Default.Settings, "Settings")
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier)
-{
+fun HomeScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,19 +65,15 @@ fun HomeScreen(modifier: Modifier = Modifier)
     }
 }
 
-
-
 @Composable
 fun AddScreen(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
-)
-{
+)  {
     var shouldScan by remember { mutableStateOf(true) }
     var waitText by remember { mutableStateOf("Processando...") }
 
-    if (shouldScan)
-    {
+    if (shouldScan) {
         ScanWithPermission(modifier) {
             if (!shouldScan)
                 return@ScanWithPermission
@@ -97,22 +105,6 @@ fun AddScreen(
 }
 
 @Composable
-fun AccountScreen(
-    viewModel: MainViewModel,
-    modifier: Modifier = Modifier
-)
-{
-    val secretKey by viewModel.secretKey.collectAsState()
-
-    OutlinedTextField(
-        value = secretKey,
-        onValueChange = { viewModel.updateSecretKey(it) },
-        label = { Text("Secret Key") },
-        modifier = modifier.fillMaxWidth()
-    )
-}
-
-@Composable
 fun AppNavHost(
     viewModel: MainViewModel,
     navController: NavHostController,
@@ -123,16 +115,9 @@ fun AppNavHost(
         navController,
         startDestination = startDestination.route
     ) {
-        Destination.entries.forEach { destination ->
-            composable(destination.route) {
-                when (destination)
-                {
-                    Destination.HOME    -> HomeScreen(modifier)
-                    Destination.LOOKUP  -> LookupScreen(viewModel, modifier)
-                    Destination.ADD     -> AddScreen(viewModel, modifier)
-                    Destination.ACCOUNT -> AccountScreen(viewModel, modifier)
-                }
-            }
-        }
+        composable(Destination.HOME.route)     { HomeScreen(modifier) }
+        composable(Destination.LOOKUP.route)   { LookupScreen(viewModel, modifier) }
+        composable(Destination.ADD.route)      { AddScreen(viewModel, modifier) }
+        composable(Destination.SETTINGS.route) { SettingsScreen(viewModel, modifier) }
     }
 }

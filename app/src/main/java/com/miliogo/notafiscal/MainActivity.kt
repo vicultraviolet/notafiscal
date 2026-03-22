@@ -53,8 +53,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(mainViewModel: MainViewModel)
-{
+fun App(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
     val startDestination = Destination.HOME
     var selectedDestination by remember { mutableIntStateOf(startDestination.ordinal) }
