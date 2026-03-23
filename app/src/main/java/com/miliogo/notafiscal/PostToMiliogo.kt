@@ -48,7 +48,13 @@ suspend fun postToMiliogo(
         val responseBuilder = StringBuilder()
         val responseCode = connection.responseCode
 
-        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+        val stream = if (responseCode >= 400) {
+            connection.errorStream
+        } else {
+            connection.inputStream
+        }
+
+        val reader = BufferedReader(InputStreamReader(stream))
         var line: String?
 
         while (reader.readLine().also { line = it } != null)
