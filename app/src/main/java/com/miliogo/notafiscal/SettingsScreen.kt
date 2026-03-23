@@ -82,6 +82,15 @@ fun SettingsScreen(
                         label = { Text("Secret Key") },
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    TextButton(
+                        onClick = { viewModel.updateSecretKey("") },
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = buttonModifier
+                    ) {
+                        Text("Sair da conta")
+                    }
                 }
             } else {
                 Column(
