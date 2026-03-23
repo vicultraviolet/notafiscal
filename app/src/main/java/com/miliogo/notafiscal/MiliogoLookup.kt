@@ -26,5 +26,5 @@ suspend fun lookupMiliogoProducts(info: JsonObject): List<Product>
         info
     )
 
-    return json.decodeFromString(response)
+    return json.decodeFromString(response.data)
 }

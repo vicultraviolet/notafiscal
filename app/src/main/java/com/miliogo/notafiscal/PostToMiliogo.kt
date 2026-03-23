@@ -11,15 +11,15 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import kotlin.time.Duration.Companion.seconds
 
+class MiliogoPostResponse(val data: String, val code: Int)
 
 suspend fun postToMiliogo(
     phpScript: String,
     json: JsonObject,
     secretKey: String? = null
-): String
-{
+): MiliogoPostResponse {
     var connection: HttpURLConnection? = null
-    var response = ""
+    var response = MiliogoPostResponse("", 0)
 
     try
     {
@@ -48,20 +48,16 @@ suspend fun postToMiliogo(
         val responseBuilder = StringBuilder()
         val responseCode = connection.responseCode
 
-        if (responseCode == HttpURLConnection.HTTP_OK)
-        {
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            var line: String?
+        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+        var line: String?
 
-            while (reader.readLine().also { line = it } != null)
-                responseBuilder.append(line)
+        while (reader.readLine().also { line = it } != null)
+            responseBuilder.append(line)
 
-            reader.close()
-        }
+        reader.close()
 
-        response = responseBuilder.toString()
-    } catch (e: Exception)
-    {
+        response = MiliogoPostResponse(responseBuilder.toString(), responseCode)
+    } catch (e: Exception) {
         e.printStackTrace()
     } finally {
         connection?.disconnect()

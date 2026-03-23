@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 
 enum class Settings(val route: String) {
     MAIN("main"),
-    SIGN_IN("sign_in"),
+    LOGIN("login"),
     CREATE_ACCOUNT("create_account"),
     ACCOUNT("account")
 }
@@ -45,7 +46,9 @@ fun SettingsScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val button_modifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)
+    var error by remember { mutableStateOf("") }
+
+    val buttonModifier = Modifier.fillMaxWidth().height(64.dp).padding(vertical = 4.dp)
 
     NavHost(
         navController = navController,
@@ -58,10 +61,10 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 TextButton(
-                    onClick = { navController.navigate("account") },
+                    onClick = { navController.navigate(Settings.ACCOUNT.route) },
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     shape = RoundedCornerShape(4.dp),
-                    modifier = button_modifier
+                    modifier = buttonModifier
                 ) {
                     Text("Minha conta")
                 }
@@ -69,37 +72,50 @@ fun SettingsScreen(
         }
         composable(Settings.ACCOUNT.route) {
             if (!secretKey.isEmpty()) {
-                OutlinedTextField(
-                    value = secretKey,
-                    onValueChange = { viewModel.updateSecretKey(it) },
-                    label = { Text("Secret Key") },
-                    modifier = modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    OutlinedTextField(
+                        value = secretKey,
+                        onValueChange = { viewModel.updateSecretKey(it) },
+                        label = { Text("Secret Key") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             } else {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(vertical = 4.dp),
                     verticalArrangement = Arrangement.Top,
                 ) {
                     TextButton(
-                        onClick = { navController.navigate("sign_in") },
+                        onClick = { navController.navigate(Settings.LOGIN.route) },
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                         shape = RoundedCornerShape(4.dp),
-                        modifier = button_modifier
+                        modifier = buttonModifier
                     ) {
                         Text("Entrar")
                     }
                     TextButton(
-                        onClick = { navController.navigate("create_account") },
+                        onClick = { navController.navigate(Settings.CREATE_ACCOUNT.route) },
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                         shape = RoundedCornerShape(4.dp),
-                        modifier = button_modifier
+                        modifier = buttonModifier
                     ) {
                         Text("Criar conta")
                     }
                 }
             }
         }
-        composable(Settings.SIGN_IN.route) {
+        composable(Settings.LOGIN.route) {
+            LaunchedEffect(secretKey) {
+                if (!secretKey.isEmpty()) {
+                    navController.navigate(Settings.ACCOUNT.route) {
+                        popUpTo(Settings.LOGIN.route) { inclusive = true }
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
@@ -123,16 +139,42 @@ fun SettingsScreen(
                 )
 
                 TextButton(
-                    onClick = { viewModel.updateSecretKey("ajaj") },
+                    onClick = {
+                        viewModel.miliogoUser(
+                            MiliogoUserAction.LOGIN,
+                            username,
+                            password,
+                            onError = { error = it }
+                        ) {
+                            error = ""
+                            viewModel.updateSecretKey(it)
+                        }
+                    },
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth().height(56.dp)
                 ) {
                     Text("Entrar")
                 }
+
+                if (!error.isEmpty()) {
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+
+                    Text(error)
+                }
             }
         }
         composable(Settings.CREATE_ACCOUNT.route) {
+            LaunchedEffect(secretKey) {
+                if (!secretKey.isEmpty()) {
+                    navController.navigate(Settings.ACCOUNT.route) {
+                        popUpTo(Settings.LOGIN.route) { inclusive = true }
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
@@ -156,12 +198,30 @@ fun SettingsScreen(
                 )
 
                 TextButton(
-                    onClick = { viewModel.updateSecretKey("ajaj") },
+                    onClick = {
+                        viewModel.miliogoUser(
+                            MiliogoUserAction.CREATE,
+                            username,
+                            password,
+                            onError = { error = it }
+                        ) {
+                            error = ""
+                            viewModel.updateSecretKey(it)
+                        }
+                    },
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth().height(56.dp)
                 ) {
                     Text("Criar conta")
+                }
+
+                if (!error.isEmpty()) {
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+
+                    Text(error)
                 }
             }
         }
