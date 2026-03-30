@@ -1,15 +1,11 @@
 package com.miliogo.notafiscal
 
-import android.util.Log
-import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import kotlin.time.Duration.Companion.seconds
 
 class MiliogoPostResponse(val data: String, val code: Int)
 
@@ -21,8 +17,7 @@ suspend fun postToMiliogo(
     var connection: HttpURLConnection? = null
     var response = MiliogoPostResponse("", 0)
 
-    try
-    {
+    try {
         val url = URL("https://miliogo.com/$phpScript")
         connection = url.openConnection() as HttpURLConnection
 

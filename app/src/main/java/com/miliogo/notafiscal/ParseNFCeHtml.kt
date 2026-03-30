@@ -1,5 +1,6 @@
 package com.miliogo.notafiscal
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.put
 import org.jsoup.Jsoup
@@ -21,14 +22,15 @@ fun changeDateFormat(
     return formatter.format(date)
 }
 
-fun parseNFCeHtml(html: String, url: String = ""): JsonObject
-{
+@OptIn(ExperimentalSerializationApi::class)
+fun parseNFCeHtml(html: String, url: String = ""): JsonObject {
     val doc = Jsoup.parse(html)
 
     val table = doc.selectFirst("table")
     val tds = table?.select("td")
 
     val chaveAcesso = tds?.get(3)?.text()?.replace("[^0-9]".toRegex(), "")
+        ?: return buildJsonObject { put("chave_acesso", null) }
 
     val fieldsets = doc.select("fieldset")
 
@@ -39,15 +41,12 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
         put("chave_acesso", chaveAcesso)
         put("url_consulta", url)
 
-        for (fieldset in fieldsets)
-        {
+        for (fieldset in fieldsets) {
             val legend = fieldset.selectFirst("legend")?.text()
             val spans = fieldset.select("span")
 
-            when (legend)
-            {
-                "Dados da NF-e" ->
-                {
+            when (legend) {
+                "Dados da NF-e" -> {
                     put("numero_cfe",        spans[2].text())
                     put("numero_serie_sat",  spans[1].text())
                     put("valor_total",       spans[5].text()
@@ -65,10 +64,8 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
 
                     put("data_hora_emissao", correctDateTime)
                 }
-                "Dados do Emitente" ->
-                {
-                    putJsonObject("emitente")
-                    {
+                "Dados do Emitente" -> {
+                    putJsonObject("emitente") {
                         put("cnpj",      spans[2].text())
                         put("ie",        spans[10].text())
                         put("im",        spans[11].text())
@@ -89,16 +86,13 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                             .replace("\\s+".toRegex(), " "))
                     }
                 }
-                "Dados do Destinatário" ->
-                {
-                    putJsonObject("consumidor")
-                    {
+                "Dados do Destinatário" -> {
+                    putJsonObject("consumidor") {
                         put("cpf_consumidor",          spans[1].text())
                         put("razao_social_consumidor", spans[0].text())
                     }
                 }
-                "Totais" ->
-                {
+                "Totais" -> {
                     put("total_tributos", spans[spans.size-1].text()
                         .replace(',', '.'))
                 }
@@ -106,10 +100,8 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
             }
         }
 
-        putJsonArray("itens")
-        {
-            for (i in 0..<toggleBoxes.size)
-            {
+        putJsonArray("itens") {
+            for (i in 0..<toggleBoxes.size) {
                 val spans = toggleBoxes[i].select("span")
                 val spans2 = toggableBoxes[i].select("span")
 
@@ -125,8 +117,7 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
                     put("valor_total", spans[4].text()
                         .replace(',', '.'))
 
-                    if (GET_EAN_CODE)
-                    {
+                    if (GET_EAN_CODE) {
                         val gtin = spans2[13].text()
                         if (gtin != "SEM GTIN")
                             put("codigo", gtin)
@@ -158,3 +149,9 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject
     }
 }
 
+fun validateNFCeJson(json: JsonObject): Boolean {
+    return json["chave_acesso"]?.jsonPrimitive?.content != null &&
+            json["valor_total"]?.jsonPrimitive?.float != null &&
+            json["emitente"]?.jsonObject["cnpj"]?.jsonPrimitive?.content != null &&
+            json["itens"]?.jsonArray != null
+}

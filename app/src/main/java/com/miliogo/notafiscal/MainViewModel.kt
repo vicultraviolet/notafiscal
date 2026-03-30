@@ -1,5 +1,6 @@
 package com.miliogo.notafiscal
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import java.net.HttpURLConnection
@@ -19,12 +21,13 @@ enum class MiliogoUserAction {
     LOGIN, CREATE
 }
 
+fun String.isValidURL(): Boolean = Patterns.WEB_URL.matcher(this).matches()
+
 class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel() {
     private val _secretKey = MutableStateFlow("")
     val secretKey: StateFlow<String> = _secretKey.asStateFlow()
 
     init {
-        // Load saved data when ViewModel is created
         viewModelScope.launch {
             dataStoreManager.secretKey.collect { savedInput ->
                 _secretKey.value = savedInput
@@ -42,18 +45,38 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
 
     fun processNFCe(
         urlString: String,
-        onResult: suspend CoroutineScope.(miliogoResponse: String) -> Unit
+        onResult: suspend CoroutineScope.(message: String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
+            if ("www.nfce.fazenda.sp.gov.br" !in urlString)
+                return@launch onResult("QR Code inválido: Não contém o URL www.nfce.fazenda.sp.gov.br")
+
+            if (urlString.length < 80)
+                return@launch onResult("QR Code inválido: URL não atingiu o mínimo de caractéres de um cupom!")
+
+            if (urlString.count { it.isDigit() } < 44)
+                return@launch onResult("QR Code inválido: URL não contém uma chave de acesso NFC-e!")
+
             val html = downloadNFCe(urlString)
             val json = parseNFCeHtml(html, urlString)
+
+            if (!validateNFCeJson(json)) {
+                if (urlString.length <= 180)
+                    return@launch onResult("Falha ao processar dados do cupom!")
+
+                return@launch onResult("Falha ao processor dados do cupom. Tente novamente mais tarde!")
+            }
+
             val response = postToMiliogo(
                 "cupom/import_json.php",
                 json,
                 secretKey.value
             )
+            val parsedResponse = Json.parseToJsonElement(response.data).jsonObject
 
-            onResult(response.data)
+            val message = parsedResponse["mensagem"]?.jsonPrimitive?.content.toString()
+
+            onResult(message)
         }
     }
 
@@ -88,14 +111,16 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
                 },
                 null
             )
-            val responseJson = Json.decodeFromString<Map<String, JsonElement>>(response.data)
+
+            val parsedResponse = Json.parseToJsonElement(response.data).jsonObject
+
             if (response.code == HttpURLConnection.HTTP_OK) {
-                val secretKey = responseJson["secret"]?.jsonPrimitive?.content
+                val secretKey = parsedResponse["secret"]?.jsonPrimitive?.content
                 if (secretKey != null) {
                     onResult(secretKey)
                 }
             } else {
-                val error = responseJson["erro"]?.jsonPrimitive?.content
+                val error = parsedResponse["erro"]?.jsonPrimitive?.content
                 if (error != null) {
                     onError(error)
                 }

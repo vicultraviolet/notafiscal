@@ -5,6 +5,7 @@ import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.HttpURLConnection
 import java.net.URL
@@ -19,10 +20,9 @@ suspend fun downloadNFCe(urlString: String): String
     var connection2: HttpURLConnection? = null
 
     val cookieManager = CookieManager()
-    java.net.CookieHandler.setDefault(cookieManager)
+    CookieHandler.setDefault(cookieManager)
 
-    try
-    {
+    try {
         val url = URL(urlString)
         connection = url.openConnection() as HttpURLConnection
 
@@ -35,8 +35,7 @@ suspend fun downloadNFCe(urlString: String): String
         val response = StringBuilder()
         val responseCode = connection.responseCode
 
-        if (responseCode == HttpURLConnection.HTTP_OK)
-        {
+        if (responseCode == HttpURLConnection.HTTP_OK) {
             val reader = BufferedReader(InputStreamReader(connection.inputStream))
             var line: String?
 
@@ -52,15 +51,12 @@ suspend fun downloadNFCe(urlString: String): String
 
         val params = HashMap<String, String>()
 
-        for (input in inputs)
-        {
+        for (input in inputs) {
             val name = input.attr("name")
             var value = input.attr("value")
 
             if (name == "__EVENTTARGET")
-            {
                 value = "btnVisualizarAbas"
-            }
 
             val names = listOf(
                 "__EVENTTARGET",
@@ -100,8 +96,7 @@ suspend fun downloadNFCe(urlString: String): String
         val response2 = StringBuilder()
         val responseCode2 = connection2.responseCode
 
-        if (responseCode2 == HttpURLConnection.HTTP_OK)
-        {
+        if (responseCode2 == HttpURLConnection.HTTP_OK) {
             val reader = BufferedReader(InputStreamReader(connection2.inputStream))
             var line: String?
 
@@ -112,8 +107,7 @@ suspend fun downloadNFCe(urlString: String): String
         }
 
         return response2.toString()
-    } catch (e: Exception)
-    {
+    } catch (e: Exception) {
         e.printStackTrace()
     } finally {
         connection?.disconnect()

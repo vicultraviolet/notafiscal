@@ -15,8 +15,7 @@ class Product(
     val emitente: String
 )
 
-suspend fun lookupMiliogoProducts(info: JsonObject): List<Product>
-{
+suspend fun lookupMiliogoProducts(info: JsonObject): List<Product> {
     val json = Json {
         encodeDefaults = false
     }
