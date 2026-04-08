@@ -43,10 +43,14 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject {
 
         for (fieldset in fieldsets) {
             val legend = fieldset.selectFirst("legend")?.text()
+                ?.replace(Regex("\\R"), "")
+                ?.split(Regex("\\s+"))
+                ?.joinToString(" ")
+
             val spans = fieldset.select("span")
 
             when (legend) {
-                "Dados da NF-e" -> {
+                "Dados da NF-e: $chaveAcesso" -> {
                     put("numero_cfe",        spans[2].text())
                     put("numero_serie_sat",  spans[1].text())
                     put("valor_total",       spans[5].text()
@@ -92,7 +96,7 @@ fun parseNFCeHtml(html: String, url: String = ""): JsonObject {
                         put("razao_social_consumidor", spans[0].text())
                     }
                 }
-                "Totais" -> {
+                "ICMS" -> {
                     put("total_tributos", spans[spans.size-1].text()
                         .replace(',', '.'))
                 }
