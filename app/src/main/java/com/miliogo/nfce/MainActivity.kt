@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal
+package com.miliogo.nfce
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,14 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.miliogo.notafiscal.ui.theme.NotaFiscalTheme
+import com.miliogo.nfce.ui.theme.NotaFiscalTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.miliogo.notafiscal.screens.AddScreen
-import com.miliogo.notafiscal.screens.Destination
-import com.miliogo.notafiscal.screens.HomeScreen
-import com.miliogo.notafiscal.screens.LookupScreen
-import com.miliogo.notafiscal.screens.SettingsScreen
+import com.miliogo.nfce.screens.AddScreen
+import com.miliogo.nfce.screens.Destination
+import com.miliogo.nfce.screens.HomeScreen
+import com.miliogo.nfce.screens.LookupScreen
+import com.miliogo.nfce.screens.SettingsScreen
 
 class MainActivity : ComponentActivity() {
     var dataStoreManager: DataStoreManager? = null
@@ -61,7 +61,7 @@ fun App(viewModel: MainViewModel) {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Nota Fiscal")
+                    Text("Cupom Fiscal")
                 }
             )
         },

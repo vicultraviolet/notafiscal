@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.screens
+package com.miliogo.nfce.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +26,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.miliogo.notafiscal.MainViewModel
-import com.miliogo.notafiscal.MiliogoUserAction
+import com.miliogo.nfce.MainViewModel
+import com.miliogo.nfce.MiliogoUserAction
 
 enum class Settings(val route: String) {
     MAIN("main"),

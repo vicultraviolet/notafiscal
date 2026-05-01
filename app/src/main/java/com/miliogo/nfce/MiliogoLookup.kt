@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal
+package com.miliogo.nfce
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

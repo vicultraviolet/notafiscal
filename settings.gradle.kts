@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Nota Fiscal"
+rootProject.name = "Cupom Fiscal"
 include(":app")

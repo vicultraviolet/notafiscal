@@ -1,4 +1,4 @@
-# Miliogo Nota Fiscal
+# Miliogo Cupom Fiscal
 
 Programa que lê QR-Codes de notas fiscais NFC-e e importa os dados dos produtos no https://miliogo.com/cupom/
 

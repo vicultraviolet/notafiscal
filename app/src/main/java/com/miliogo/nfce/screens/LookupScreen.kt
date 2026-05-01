@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.screens
+package com.miliogo.nfce.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.miliogo.notafiscal.MainViewModel
-import com.miliogo.notafiscal.Product
+import com.miliogo.nfce.MainViewModel
+import com.miliogo.nfce.Product
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.util.Locale

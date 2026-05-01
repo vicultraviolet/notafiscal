@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.screens
+package com.miliogo.nfce.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

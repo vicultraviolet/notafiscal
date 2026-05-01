@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.screens
+package com.miliogo.nfce.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.miliogo.notafiscal.MainViewModel
-import com.miliogo.notafiscal.ScanWithPermission
+import com.miliogo.nfce.MainViewModel
+import com.miliogo.nfce.ScanWithPermission
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 

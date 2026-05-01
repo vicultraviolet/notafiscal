@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.ui.theme
+package com.miliogo.nfce.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

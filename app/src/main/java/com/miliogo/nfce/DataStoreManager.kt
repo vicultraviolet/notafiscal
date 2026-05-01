@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal
+package com.miliogo.nfce
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

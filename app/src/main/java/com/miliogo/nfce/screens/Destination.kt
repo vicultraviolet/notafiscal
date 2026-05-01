@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal.screens
+package com.miliogo.nfce.screens
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add

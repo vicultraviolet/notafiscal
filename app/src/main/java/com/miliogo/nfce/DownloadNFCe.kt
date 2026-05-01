@@ -1,4 +1,4 @@
-package com.miliogo.notafiscal
+package com.miliogo.nfce
 
 import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
