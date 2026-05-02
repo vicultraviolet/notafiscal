@@ -10,12 +10,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NotaFiscal">
+        android:theme="@style/Theme.CupomFiscal">
         <activity
-            android:name=".MainActivity"
+            android:name="com.miliogo.nfce.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.NotaFiscal">
+            android:theme="@style/Theme.CupomFiscal">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

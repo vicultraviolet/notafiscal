@@ -6,17 +6,17 @@ plugins {
 }
 
 android {
-    namespace = "com.miliogo.notafiscal"
+    namespace = "com.miliogo.nfce"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.miliogo.notafiscal"
+        applicationId = "com.miliogo.nfce"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
