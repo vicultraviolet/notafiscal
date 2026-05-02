@@ -6,5 +6,5 @@ Eventualmente terá funcionalidade de consultar os produtos pelo app em si, alé
 
 
 
-Versão 2.0 no Android do https://github.com/ivantgm/consulta\_sat
+Versão 2.0 no Android do https://github.com/ivantgm/consulta_sat
 
