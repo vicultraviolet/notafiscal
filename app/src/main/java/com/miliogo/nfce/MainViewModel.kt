@@ -57,13 +57,16 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
                     secretKey.value
                 )
 
+                if (response.code == 0)
+                    return@launch onResult(NO_INTERNET_MESSAGE)
+
                 val parsedResponse = Json.parseToJsonElement(response.data).jsonObject
 
                 if (parsedResponse["sucesso"]?.jsonPrimitive?.boolean != true) {
                     val error = parsedResponse["erro"]?.jsonPrimitive?.content.toString()
                     val details = parsedResponse["detalhes"]?.jsonPrimitive?.content.toString()
 
-                    return@launch onResult("$error: $details")
+                    return@launch onResult("${response.code}: $error: $details")
                 }
             }
 
@@ -92,12 +95,11 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
 
     fun lookupMiliogoProducts(
         info: JsonObject,
-        onResult: suspend CoroutineScope.(products: List<Product>) -> Unit
+        onResult: suspend CoroutineScope.(result: MiliogoLookupResult) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val products = lookupMiliogoProducts(info)
-
-            onResult(products)
+            val result = lookupMiliogoProducts(info)
+            onResult(result)
         }
     }
 
@@ -121,6 +123,9 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
                 },
                 null
             )
+
+            if (response.code == 0)
+                return@launch onError(NO_INTERNET_MESSAGE)
 
             val parsedResponse = Json.parseToJsonElement(response.data).jsonObject
 

@@ -48,6 +48,7 @@ fun LookupScreen(
 {
     var query by remember { mutableStateOf("") }
     var products by remember { mutableStateOf(emptyList<Product>()) }
+    var message by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -62,7 +63,8 @@ fun LookupScreen(
                     put("nome", query)
                 }
             ) {
-                products = it
+                products = it.data
+                message = it.message
             }
         }
 
@@ -74,7 +76,11 @@ fun LookupScreen(
             fontSize = 10.sp
         )
 
-        ProductList(products)
+        if (!message.isEmpty())
+            Text(message, textAlign = TextAlign.Center)
+
+        if (!products.isEmpty())
+            ProductList(products)
     }
 }
 

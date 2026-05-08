@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
 @Serializable
-class Product(
+data class Product(
     val codigo: String,
     val nome: String,
     val un: String,
@@ -15,7 +15,12 @@ class Product(
     val emitente: String
 )
 
-suspend fun lookupMiliogoProducts(info: JsonObject): List<Product> {
+data class MiliogoLookupResult(
+    val data: List<Product>,
+    val message: String
+)
+
+suspend fun lookupMiliogoProducts(info: JsonObject): MiliogoLookupResult {
     val json = Json {
         encodeDefaults = false
     }
@@ -24,6 +29,15 @@ suspend fun lookupMiliogoProducts(info: JsonObject): List<Product> {
         "cupom/consulta.php",
         info
     )
+    if (response.code != 200) {
+        val message =
+            if (response.code != 0)
+                "Falha em conectar ao Miliogo! (Código ${response.code})"
+            else
+                NO_INTERNET_MESSAGE
 
-    return json.decodeFromString(response.data)
+        return MiliogoLookupResult(emptyList(), message)
+    }
+
+    return MiliogoLookupResult(json.decodeFromString(response.data), "")
 }

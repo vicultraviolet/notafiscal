@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets
 
 class MiliogoPostResponse(val data: String, val code: Int)
 
+const val NO_INTERNET_MESSAGE = "Falha em conectar ao Miliogo! (Código 0): Verifique se você está conectado à internet."
+
 suspend fun postToMiliogo(
     phpScript: String,
     json: JsonObject,
