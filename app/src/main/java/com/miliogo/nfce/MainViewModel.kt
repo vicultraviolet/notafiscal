@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -46,14 +47,25 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
         onResult: suspend CoroutineScope.(message: String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if ("www.nfce.fazenda.sp.gov.br" !in urlString)
-                return@launch onResult("QR Code inválido: Não contém o URL www.nfce.fazenda.sp.gov.br")
+            // url validation
+            run {
+                val response = postToMiliogo(
+                    "cupom/url.php",
+                    buildJsonObject {
+                        put("url", urlString)
+                    },
+                    secretKey.value
+                )
 
-            if (urlString.length < 80)
-                return@launch onResult("QR Code inválido: URL não atingiu o mínimo de caractéres de um cupom!")
+                val parsedResponse = Json.parseToJsonElement(response.data).jsonObject
 
-            if (urlString.count { it.isDigit() } < 44)
-                return@launch onResult("QR Code inválido: URL não contém uma chave de acesso NFC-e!")
+                if (parsedResponse["sucesso"]?.jsonPrimitive?.boolean != true) {
+                    val error = parsedResponse["erro"]?.jsonPrimitive?.content.toString()
+                    val details = parsedResponse["detalhes"]?.jsonPrimitive?.content.toString()
+
+                    return@launch onResult("$error: $details")
+                }
+            }
 
             val html = downloadNFCe(urlString)
             val json = parseNFCeHtml(html, urlString)
