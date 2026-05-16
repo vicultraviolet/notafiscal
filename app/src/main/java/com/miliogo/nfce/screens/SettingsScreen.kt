@@ -11,6 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,9 +31,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.miliogo.nfce.MainViewModel
 import com.miliogo.nfce.MiliogoUserAction
+import com.miliogo.nfce.ui.theme.CurrentTheme
 
 enum class Settings(val route: String) {
     MAIN("main"),
+    APPEARANCES("appearances"),
     LOGIN("login"),
     CREATE_ACCOUNT("create_account"),
     ACCOUNT("account")
@@ -49,13 +54,50 @@ fun SettingsButton(text: String, modifier: Modifier = Modifier, onClick: () -> U
 }
 
 @Composable
-fun MainSettings(navController: NavController) {
+fun MainSettings(
+    viewModel: MainViewModel,
+    navController: NavController
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(vertical = 4.dp),
         verticalArrangement = Arrangement.Top
     ) {
         SettingsButton(text = "Minha conta") {
             navController.navigate(Settings.ACCOUNT.route)
+        }
+
+        SettingsButton(text = "Aparência") {
+            navController.navigate(Settings.APPEARANCES.route)
+        }
+    }
+}
+
+@Composable
+fun AppearancesSettings(
+    viewModel: MainViewModel,
+) {
+    val themeLabels = listOf("Claro", "Escuro", "Padrão do Sistema")
+    val currentTheme by viewModel.theme.collectAsState()
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth().height(64.dp)
+        ) {
+            themeLabels.forEachIndexed { index, label ->
+                SegmentedButton(
+                    modifier = Modifier.height(56.dp),
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = themeLabels.size
+                    ),
+                    onClick = { viewModel.updateCurrentTheme(CurrentTheme.entries[index])},
+                    selected = currentTheme.ordinal == index,
+                    label = { Text(label) }
+                )
+            }
         }
     }
 }
@@ -176,7 +218,8 @@ fun SettingsScreen(
         startDestination = startDestination.route,
         modifier = modifier.fillMaxSize()
     ) {
-        composable(Settings.MAIN.route) { MainSettings(navController) }
+        composable(Settings.MAIN.route) { MainSettings(viewModel, navController) }
+        composable(Settings.APPEARANCES.route) { AppearancesSettings(viewModel) }
         composable(Settings.ACCOUNT.route) { AccountSettings(viewModel, navController) }
         composable(Settings.LOGIN.route) { LogInSettings(viewModel, navController, MiliogoUserAction.LOGIN)}
         composable(Settings.CREATE_ACCOUNT.route) { LogInSettings(viewModel, navController, MiliogoUserAction.CREATE)}

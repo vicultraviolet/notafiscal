@@ -44,7 +44,6 @@ fun AddScreen(
         return
     }
 
-
     ScanWithPermission(modifier) {
         if (!shouldScan)
             return@ScanWithPermission

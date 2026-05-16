@@ -3,6 +3,7 @@ package com.miliogo.nfce
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.miliogo.nfce.ui.theme.CurrentTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,16 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
     private val _secretKey = MutableStateFlow("")
     val secretKey: StateFlow<String> = _secretKey.asStateFlow()
 
+    private val _theme = MutableStateFlow(CurrentTheme.Default)
+    val theme: StateFlow<CurrentTheme> = _theme.asStateFlow()
+
     init {
+        viewModelScope.launch {
+            dataStoreManager.theme.collect { theme ->
+                _theme.value = theme
+            }
+        }
+
         viewModelScope.launch {
             dataStoreManager.secretKey.collect { savedInput ->
                 _secretKey.value = savedInput
@@ -38,7 +48,15 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
         _secretKey.value = newSecretKey
 
         viewModelScope.launch {
-            dataStoreManager.saveUserInput(newSecretKey)
+            dataStoreManager.saveSecretKey(newSecretKey)
+        }
+    }
+
+    fun updateCurrentTheme(newTheme: CurrentTheme) {
+        _theme.value = newTheme
+
+        viewModelScope.launch {
+            dataStoreManager.saveTheme(newTheme)
         }
     }
 

@@ -32,17 +32,26 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+enum class CurrentTheme {
+    Light, Dark, Default
+}
+
 @Composable
 fun NotaFiscalTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    theme: CurrentTheme,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = theme == CurrentTheme.Dark || (theme == CurrentTheme.Default && isSystemInDarkTheme())
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme)
+                dynamicDarkColorScheme(context)
+            else
+                dynamicLightColorScheme(context)
         }
 
         darkTheme -> DarkColorScheme

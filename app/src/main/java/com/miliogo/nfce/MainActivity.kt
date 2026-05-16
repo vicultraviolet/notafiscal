@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.miliogo.nfce.screens.Destination
 import com.miliogo.nfce.screens.HomeScreen
 import com.miliogo.nfce.screens.LookupScreen
 import com.miliogo.nfce.screens.SettingsScreen
+import com.miliogo.nfce.ui.theme.CurrentTheme
 
 class MainActivity : ComponentActivity() {
     var dataStoreManager: DataStoreManager? = null
@@ -42,7 +44,16 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { NotaFiscalTheme { mainViewModel?.let { App(it) } } }
+
+        setContent {
+            val theme = mainViewModel?.theme?.collectAsState()?.value ?: CurrentTheme.Default
+
+            NotaFiscalTheme(theme) {
+                mainViewModel?.let {
+                    App(it)
+                }
+            }
+        }
     }
 }
 
