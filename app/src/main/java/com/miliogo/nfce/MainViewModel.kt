@@ -95,7 +95,7 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
                 if (urlString.length <= 180)
                     return@launch onResult("Falha ao processar dados do cupom!")
 
-                return@launch onResult("Falha ao processor dados do cupom. Tente novamente mais tarde!")
+                return@launch onResult("Este cupom foi emitido em contingência e seus dados estão inobtíveis por enquanto. Tente novamente mais tarde!")
             }
 
             val response = postToMiliogo(
