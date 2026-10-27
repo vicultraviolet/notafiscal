@@ -53,7 +53,7 @@ fun AddScreen(
             shouldScan = false
             waitText = msg
 
-            delay(3.seconds)
+            delay(5.seconds)
 
             shouldScan = true
             waitText = "Processando..."
