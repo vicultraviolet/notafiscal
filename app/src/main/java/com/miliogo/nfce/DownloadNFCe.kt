@@ -12,10 +12,18 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
-const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
 
-suspend fun downloadNFCe(urlString: String): String
-{
+private fun fillConnection(connection: HttpURLConnection) {
+    connection.connectTimeout = 15000
+    connection.readTimeout = 15000
+
+    connection.setRequestProperty("User-Agent", USER_AGENT)
+    connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+    connection.setRequestProperty("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.5")
+}
+
+suspend fun downloadNFCe(urlString: String): String {
     var connection: HttpURLConnection? = null
     var connection2: HttpURLConnection? = null
 
@@ -26,11 +34,8 @@ suspend fun downloadNFCe(urlString: String): String
         val url = URL(urlString)
         connection = url.openConnection() as HttpURLConnection
 
-        connection.setRequestProperty("User-Agent", USER_AGENT)
-
+        fillConnection(connection)
         connection.requestMethod = "GET"
-        connection.connectTimeout = 10000
-        connection.readTimeout = 10000
 
         val response = StringBuilder()
         val responseCode = connection.responseCode
@@ -77,14 +82,10 @@ suspend fun downloadNFCe(urlString: String): String
         val url2 = URL("https://www.nfce.fazenda.sp.gov.br/NFCeConsultaPublica/Paginas/ConsultaResponsiva/ConsultaResumidaRJFrame_v400.aspx")
         connection2 = url2.openConnection() as HttpURLConnection
 
+        fillConnection(connection2)
         connection2.doOutput = true
-
-        connection2.setRequestProperty("User-Agent", USER_AGENT)
         connection2.setRequestProperty("Referer", urlString)
-
         connection2.requestMethod = "POST"
-        connection2.connectTimeout = 10000
-        connection2.readTimeout = 10000
 
         OutputStreamWriter(connection2.outputStream).use { writer ->
             writer.write(formData)

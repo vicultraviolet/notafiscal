@@ -7,6 +7,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
+const val MILIOGO_USER_AGENT = "miliogo-cupom-android-client/1.0"
+
 class MiliogoPostResponse(val data: String, val code: Int)
 
 const val NO_INTERNET_MESSAGE = "Falha em conectar ao Miliogo! (Código 0): Verifique se você está conectado à internet."
@@ -26,7 +28,7 @@ suspend fun postToMiliogo(
         connection.doOutput = true
 
         connection.setRequestProperty("Content-Type", "application/json")
-        connection.setRequestProperty("User-Agent", "miliogo-cupom-android-client/1.0")
+        connection.setRequestProperty("User-Agent", MILIOGO_USER_AGENT)
         if (secretKey != null)
             connection.setRequestProperty("secret-key", secretKey)
 
