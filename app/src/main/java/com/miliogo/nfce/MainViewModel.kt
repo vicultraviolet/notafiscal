@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.miliogo.nfce.ui.theme.CurrentTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.coroutines.flow.*
@@ -16,6 +17,22 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import java.net.HttpURLConnection
+import kotlin.time.Duration.Companion.milliseconds
+
+suspend fun <T> withMinimumDuration(
+    minDurationMillis: Long = 1000L,
+    block: suspend () -> T
+): T {
+    val startTime = System.currentTimeMillis()
+    val result = block()
+    val elapsed = System.currentTimeMillis() - startTime
+
+    if (elapsed < minDurationMillis) {
+        delay((minDurationMillis - elapsed).milliseconds)
+    }
+
+    return result
+}
 
 enum class MiliogoUserAction {
     LOGIN, CREATE
@@ -116,7 +133,9 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
         onResult: suspend CoroutineScope.(result: MiliogoLookupResult) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = lookupMiliogoProducts(info)
+            val result = withMinimumDuration(1000) {
+                lookupMiliogoProducts(info)
+            }
             onResult(result)
         }
     }

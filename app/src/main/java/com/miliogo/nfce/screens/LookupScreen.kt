@@ -61,6 +61,7 @@ fun LookupScreen(
             query,
             onQueryChange = { query = it }
         ) {
+            message = "Consultando..."
             viewModel.lookupMiliogoProducts(
                 buildJsonObject {
                     put("nome", query)
